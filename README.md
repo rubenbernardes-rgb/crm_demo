@@ -16,3 +16,15 @@ Open a terminal and run:
 `git checkout pi`
 
 This README should be updated automatically; follow the new instructions
+## Running the app
+
+Run `npm install` once, then start the CRM with a single command:
+
+```bash
+npm run dev
+```
+
+Then open **http://localhost:5173** in your browser. The app is single-user and fully local: no
+accounts, no cloud, no internet required. Its data lives in a local SQLite file (`crm.sqlite3`,
+gitignored) which is seeded with realistic sample data on first launch, so every screen looks alive
+immediately. Run the unit tests any time with `npm test`.
