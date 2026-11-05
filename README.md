@@ -28,3 +28,4 @@ Then open **http://localhost:5173** in your browser. The app is single-user and 
 accounts, no cloud, no internet required. Its data lives in a local SQLite file (`crm.sqlite3`,
 gitignored) which is seeded with realistic sample data on first launch, so every screen looks alive
 immediately. Run the unit tests any time with `npm test`.
+Edited by the agent harness.
