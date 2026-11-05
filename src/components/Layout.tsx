@@ -16,7 +16,7 @@ export function Layout() {
         <div className="brand">
           <div className="brand-mark">C</div>
           <div className="brand-name">
-            Personal CRM
+            Changed by the harness
           </div>
         </div>
         <nav className="nav">
