@@ -1,0 +1,117 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Theme: Darkmatter (tweakcn) — dark appearance, ported from the former
+   styles.css into shadcn token form. Values are HSL channel triplets because
+   tailwind.config.ts wraps them in hsl(...).
+   Canonical hex references: bg #121113, fg #c1c1c1, card #121212,
+   primary #e78a53, secondary #5f8787, border #222222, ring #e78a53,
+   destructive #ef4444, radius 0.75rem. */
+@layer base {
+  :root {
+    color-scheme: dark;
+
+    --background: 270 5.6% 7.1%; /* #121113 */
+    --foreground: 0 0% 75.7%; /* #c1c1c1 */
+    --card: 0 0% 7.1%; /* #121212 */
+    --card-foreground: 0 0% 75.7%;
+    --popover: 270 5.6% 7.1%; /* #121113 */
+    --popover-foreground: 0 0% 75.7%;
+    --primary: 22 75.5% 61.6%; /* #e78a53 */
+    --primary-foreground: 270 5.6% 7.1%; /* #121113 */
+    --secondary: 180 17.4% 45.1%; /* #5f8787 */
+    --secondary-foreground: 270 5.6% 7.1%; /* #121113 */
+    --muted: 0 0% 13.3%; /* #222222 */
+    --muted-foreground: 0 0% 53.3%; /* #888888 */
+    --accent: 0 0% 20%; /* #333333 */
+    --accent-foreground: 0 0% 75.7%;
+    --destructive: 0 84.2% 60.2%; /* #ef4444 */
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 13.3%; /* #222222 */
+    --input: 0 0% 13.3%; /* #222222 */
+    --ring: 22 75.5% 61.6%; /* #e78a53 */
+    --radius: 0.75rem;
+
+    /* Chart palette (used by dots, charts and badges via the brand scale). */
+    --chart-1: 180 17.4% 45.1%; /* #5f8787 */
+    --chart-2: 22 75.5% 61.6%; /* #e78a53 */
+    --chart-3: 31 92.6% 78.8%; /* #fbcb97 */
+    --chart-4: 0 0% 53.3%; /* #888888 */
+    --chart-5: 0 0% 60%; /* #999999 */
+    --chart-grid: 240 5% 15.7%; /* #26262a — dashboard chart gridlines */
+  }
+}
+
+/* Kept outside @layer base on purpose: Tailwind v3 purges unused class rules
+   from @layer blocks, which would silently drop the dark theme from
+   production builds. Same declarations, same cascade behavior.
+   The app is dark-only (Darkmatter), so .dark mirrors :root. */
+.dark {
+  color-scheme: dark;
+
+  --background: 270 5.6% 7.1%; /* #121113 */
+  --foreground: 0 0% 75.7%; /* #c1c1c1 */
+  --card: 0 0% 7.1%; /* #121212 */
+  --card-foreground: 0 0% 75.7%;
+  --popover: 270 5.6% 7.1%; /* #121113 */
+  --popover-foreground: 0 0% 75.7%;
+  --primary: 22 75.5% 61.6%; /* #e78a53 */
+  --primary-foreground: 270 5.6% 7.1%; /* #121113 */
+  --secondary: 180 17.4% 45.1%; /* #5f8787 */
+  --secondary-foreground: 270 5.6% 7.1%; /* #121113 */
+  --muted: 0 0% 13.3%; /* #222222 */
+  --muted-foreground: 0 0% 53.3%; /* #888888 */
+  --accent: 0 0% 20%; /* #333333 */
+  --accent-foreground: 0 0% 75.7%;
+  --destructive: 0 84.2% 60.2%; /* #ef4444 */
+  --destructive-foreground: 0 0% 98%;
+  --border: 0 0% 13.3%; /* #222222 */
+  --input: 0 0% 13.3%; /* #222222 */
+  --ring: 22 75.5% 61.6%; /* #e78a53 */
+
+  --chart-1: 180 17.4% 45.1%; /* #5f8787 */
+  --chart-2: 22 75.5% 61.6%; /* #e78a53 */
+  --chart-3: 31 92.6% 78.8%; /* #fbcb97 */
+  --chart-4: 0 0% 53.3%; /* #888888 */
+  --chart-5: 0 0% 60%; /* #999999 */
+  --chart-grid: 240 5% 15.7%; /* #26262a */
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+  /* Darkmatter focus ring (ported from the legacy stylesheet). Components
+     that manage their own focus ring set outline-none, so this only applies
+     to plain elements. */
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 1px;
+  }
+}
+
+/* Recharts tooltip polish — ported from the legacy stylesheet, adapted to
+   tokens (dark surface so tooltips don't render white on the dark theme). */
+.recharts-default-tooltip {
+  background: hsl(var(--card)) !important;
+  color: hsl(var(--foreground)) !important;
+  border-radius: 8px !important;
+  border: 1px solid hsl(var(--border)) !important;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.45) !important;
+  font-size: 12px !important;
+}
+.recharts-default-tooltip .recharts-tooltip-item {
+  color: hsl(var(--foreground)) !important;
+}
+.recharts-tooltip-label {
+  color: hsl(var(--muted-foreground)) !important;
+}

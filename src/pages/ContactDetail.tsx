@@ -4,12 +4,14 @@ import { Mail, Phone, Plus, Pencil, Trash2, Building2 } from "lucide-react";
 import { api } from "../api";
 import { useAsync } from "../lib/useAsync";
 import { formatDate } from "../lib/format";
-import { Page, Loading } from "../components/Page";
+import { Page, Loading, ErrorState } from "../components/Page";
 import { StatusBadge } from "../components/Badge";
 import { ContactForm } from "../components/ContactForm";
 import { ConfirmDialog } from "../components/ConfirmDialog";
 import { ActivityForm } from "../components/ActivityForm";
 import { ActivityTimeline } from "../components/ActivityTimeline";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function ContactDetail() {
   const { id = "" } = useParams();
@@ -30,7 +32,7 @@ export function ContactDetail() {
   if (error || !data)
     return (
       <Page title="Contact" back={{ to: "/contacts", label: "Contacts" }}>
-        <div className="error-box">{error ?? "Contact not found"}</div>
+        <ErrorState message={error ?? "Contact not found"} />
       </Page>
     );
 
@@ -49,81 +51,81 @@ export function ContactDetail() {
       back={{ to: "/contacts", label: "Contacts" }}
       actions={
         <>
-          <button className="btn" onClick={() => setActOpen(true)}>
+          <Button variant="outline" onClick={() => setActOpen(true)}>
             <Plus size={15} /> Log activity
-          </button>
-          <button className="btn" onClick={() => setFormOpen(true)}>
+          </Button>
+          <Button variant="outline" onClick={() => setFormOpen(true)}>
             <Pencil size={15} /> Edit
-          </button>
-          <button className="btn btn-danger" onClick={() => setConfirming(true)}>
+          </Button>
+          <Button variant="destructive" onClick={() => setConfirming(true)}>
             <Trash2 size={15} /> Delete
-          </button>
+          </Button>
         </>
       }
     >
-      <div className="detail-grid">
-        <div className="panel">
-          <div className="panel-head">
-            <h2>Details</h2>
-            <div className="right">
+      <div className="grid items-start gap-4 min-[880px]:grid-cols-[1.4fr_1fr]">
+        <Card>
+          <CardHeader className="flex-row items-center justify-between gap-3 space-y-0 border-b px-6 py-4">
+            <CardTitle className="text-sm font-semibold">Details</CardTitle>
+            <div className="ml-auto flex items-center gap-2">
               <StatusBadge status={contact.status} />
             </div>
-          </div>
-          <div className="panel-pad">
-            <dl className="kv">
-              <dt>Email</dt>
-              <dd>
+          </CardHeader>
+          <CardContent>
+            <dl className="grid grid-cols-[120px_1fr] gap-x-4 gap-y-2.5 text-sm">
+              <dt className="font-medium text-muted-foreground">Email</dt>
+              <dd className="m-0">
                 {contact.email ? (
-                  <a href={`mailto:${contact.email}`} className="link">
-                    <Mail size={13} style={{ verticalAlign: "middle", marginRight: 5 }} />
+                  <a href={`mailto:${contact.email}`} className="font-medium text-primary hover:underline">
+                    <Mail size={13} className="mr-1 inline align-middle" />
                     {contact.email}
                   </a>
                 ) : (
-                  <span className="muted">—</span>
+                  <span className="text-muted-foreground">—</span>
                 )}
               </dd>
-              <dt>Phone</dt>
-              <dd>
+              <dt className="font-medium text-muted-foreground">Phone</dt>
+              <dd className="m-0">
                 {contact.phone ? (
                   <span>
-                    <Phone size={13} style={{ verticalAlign: "middle", marginRight: 5 }} />
+                    <Phone size={13} className="mr-1 inline align-middle" />
                     {contact.phone}
                   </span>
                 ) : (
-                  <span className="muted">—</span>
+                  <span className="text-muted-foreground">—</span>
                 )}
               </dd>
-              <dt>Organization</dt>
-              <dd>
+              <dt className="font-medium text-muted-foreground">Organization</dt>
+              <dd className="m-0">
                 {organization ? (
-                  <Link to={`/organizations/${organization.id}`} className="link">
-                    <Building2 size={13} style={{ verticalAlign: "middle", marginRight: 5 }} />
+                  <Link to={`/organizations/${organization.id}`} className="font-medium text-primary hover:underline">
+                    <Building2 size={13} className="mr-1 inline align-middle" />
                     {organization.name}
                   </Link>
                 ) : (
-                  <span className="muted">—</span>
+                  <span className="text-muted-foreground">—</span>
                 )}
               </dd>
-              <dt>Added</dt>
-              <dd>{formatDate(contact.createdAt)}</dd>
+              <dt className="font-medium text-muted-foreground">Added</dt>
+              <dd className="m-0">{formatDate(contact.createdAt)}</dd>
             </dl>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
-        <div className="panel">
-          <div className="panel-head">
-            <h2>Activity</h2>
-            <span className="sub">{activities.length}</span>
-            <div className="right">
-              <button className="btn btn-ghost btn-sm" onClick={() => setActOpen(true)}>
+        <Card>
+          <CardHeader className="flex-row items-center justify-between gap-3 space-y-0 border-b px-6 py-4">
+            <CardTitle className="text-sm font-semibold">Activity</CardTitle>
+            <span className="text-xs text-muted-foreground">{activities.length}</span>
+            <div className="ml-auto flex items-center gap-2">
+              <Button variant="ghost" size="sm" onClick={() => setActOpen(true)}>
                 <Plus size={14} /> Log
-              </button>
+              </Button>
             </div>
-          </div>
-          <div className="panel-pad">
+          </CardHeader>
+          <CardContent>
             <ActivityTimeline activities={activities} onChange={reload} />
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
 
       <ContactForm

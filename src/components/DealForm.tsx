@@ -1,5 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { Modal } from "./Modal";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { api } from "../api";
 import type { Contact, Deal, DealStage, Organization } from "../types";
 import { STAGES } from "../types";
@@ -82,59 +92,88 @@ export function DealForm({ open, onClose, onSaved, organizations, contacts, init
       onClose={onClose}
       footer={
         <>
-          <button className="btn" onClick={onClose}>
+          <Button type="button" variant="outline" onClick={onClose}>
             Cancel
-          </button>
-          <button className="btn btn-primary" onClick={submit} disabled={saving}>
+          </Button>
+          <Button type="button" variant="default" onClick={submit} disabled={saving}>
             {saving ? "Saving…" : initial ? "Save changes" : "Add deal"}
-          </button>
+          </Button>
         </>
       }
     >
-      <div className="form-grid">
-        {error && <div className="error-box">{error}</div>}
-        <div className="field">
-          <label>Deal name *</label>
-          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Enterprise license" autoFocus />
+      <div className="grid gap-4">
+        {error && (
+          <div className="rounded-md border border-destructive/20 bg-destructive/10 px-3.5 py-2.5 text-sm text-destructive">
+            {error}
+          </div>
+        )}
+        <div className="grid gap-1.5">
+          <Label htmlFor="deal-name">Deal name *</Label>
+          <Input
+            id="deal-name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Enterprise license"
+            autoFocus
+          />
         </div>
-        <div className="form-row">
-          <div className="field">
-            <label>Organization</label>
-            <select value={organizationId} onChange={(e) => setOrganizationId(e.target.value)}>
-              <option value="">— None —</option>
-              {organizations.map((o) => (
-                <option key={o.id} value={o.id}>
-                  {o.name}
-                </option>
-              ))}
-            </select>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="grid gap-1.5">
+            <Label>Organization</Label>
+            <Select
+              value={organizationId || "none"}
+              onValueChange={(v) => setOrganizationId(v === "none" ? "" : v)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="— None —" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">— None —</SelectItem>
+                {organizations.map((o) => (
+                  <SelectItem key={o.id} value={o.id}>
+                    {o.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          <div className="field">
-            <label>Primary contact</label>
-            <select value={contactId} onChange={(e) => setContactId(e.target.value)}>
-              <option value="">— None —</option>
-              {orgContacts.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
+          <div className="grid gap-1.5">
+            <Label>Primary contact</Label>
+            <Select value={contactId || "none"} onValueChange={(v) => setContactId(v === "none" ? "" : v)}>
+              <SelectTrigger>
+                <SelectValue placeholder="— None —" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">— None —</SelectItem>
+                {orgContacts.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
-        <div className="form-row">
-          <div className="field">
-            <label>Stage</label>
-            <select value={stage} onChange={(e) => setStage(e.target.value as DealStage)}>
-              {STAGES.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="grid gap-1.5">
+            <Label>Stage</Label>
+            <Select value={stage} onValueChange={(v) => setStage(v as DealStage)}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {STAGES.map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {s}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          <div className="field">
-            <label>Value (USD)</label>
-            <input
+          <div className="grid gap-1.5">
+            <Label htmlFor="deal-value">Value (USD)</Label>
+            <Input
+              id="deal-value"
               type="number"
               min="0"
               step="1"
@@ -144,9 +183,14 @@ export function DealForm({ open, onClose, onSaved, organizations, contacts, init
             />
           </div>
         </div>
-        <div className="field">
-          <label>Close date</label>
-          <input type="date" value={closeDate} onChange={(e) => setCloseDate(e.target.value)} />
+        <div className="grid gap-1.5">
+          <Label htmlFor="deal-close-date">Close date</Label>
+          <Input
+            id="deal-close-date"
+            type="date"
+            value={closeDate}
+            onChange={(e) => setCloseDate(e.target.value)}
+          />
         </div>
       </div>
     </Modal>

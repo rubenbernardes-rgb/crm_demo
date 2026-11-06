@@ -7,7 +7,7 @@ import "@fontsource/geist-mono/500.css";
 import "@fontsource/geist-mono/600.css";
 import "@fontsource/geist-mono/700.css";
 import "@fontsource/geist-mono/800.css";
-import "./styles.css";
+import "./index.css";
 
 const root = document.getElementById("root");
 if (!root) throw new Error("Missing #root element");

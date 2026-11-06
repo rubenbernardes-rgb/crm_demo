@@ -21,8 +21,19 @@ import { Link } from "react-router-dom";
 import { api } from "../api";
 import { useAsync } from "../lib/useAsync";
 import { money, moneyShort, monthLabel, relativeTime, formatDateShort } from "../lib/format";
-import type { ActivityWithRefs } from "../types";
-import { Page } from "../components/Page";
+import type { ActivityType, ActivityWithRefs } from "../types";
+import { Page, Loading, ErrorState } from "../components/Page";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { cn } from "@/lib/utils";
+
+const FEED_TONE_CLASSES: Record<ActivityType, string> = {
+  note: "bg-muted text-muted-foreground",
+  call: "bg-brand-blue/10 text-brand-blueInk",
+  email: "bg-brand-purple/10 text-brand-purpleInk",
+};
 
 export function Dashboard() {
   const { data, loading, error, reload } = useAsync(() => api.dashboard(), []);
@@ -38,8 +49,8 @@ export function Dashboard() {
     }
   };
 
-  if (loading) return <Page title="Dashboard">{<div className="loading">Loading your dashboard…</div>}</Page>;
-  if (error || !data) return <Page title="Dashboard">{<div className="error-box">{error}</div>}</Page>;
+  if (loading) return <Page title="Dashboard">{<Loading label="Loading your dashboard…" />}</Page>;
+  if (error || !data) return <Page title="Dashboard">{<ErrorState message={error ?? ""} />}</Page>;
 
   const { summary, wonPerMonth, recentActivities, upcomingTasks, overdueTasks } = data;
   const wonChartData = wonPerMonth.map((m) => ({ label: monthLabel(m.month), count: m.count }));
@@ -49,51 +60,99 @@ export function Dashboard() {
     <Page
       title="Dashboard"
       actions={
-        <Link to="/pipeline" className="btn btn-primary">
-          <Briefcase size={15} /> Open pipeline
-        </Link>
+        <Button asChild>
+          <Link to="/pipeline">
+            <Briefcase size={15} /> Open pipeline
+          </Link>
+        </Button>
       }
     >
-      <div className="stat-grid">
-        <div className="stat">
-          <div className="label">Open deals</div>
-          <div className="value blue">{summary.openDeals}</div>
-          <div className="delta">{money(summary.pipelineValue)} in pipeline</div>
-        </div>
-        <div className="stat">
-          <div className="label">Won</div>
-          <div className="value green">{summary.wonDeals}</div>
-          <div className="delta">{money(summary.wonValue)} closed</div>
-        </div>
-        <div className="stat">
-          <div className="label">Pipeline value</div>
-          <div className="value amber">{moneyShort(summary.pipelineValue)}</div>
-          <div className="delta">across {summary.openDeals} open deals</div>
-        </div>
-        <div className="stat">
-          <div className="label">Lost</div>
-          <div className="value red">{summary.lostDeals}</div>
-          <div className="delta">closed as lost</div>
-        </div>
-        <div className="stat">
-          <div className="label">Overdue tasks</div>
-          <div className="value red">{summary.overdueCount}</div>
-          <div className="delta">needs attention</div>
-        </div>
+      <div className="mb-5 grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-3.5">
+        <Card>
+          <CardHeader className="p-4 pb-0">
+            <CardTitle className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Open deals
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 pt-1.5">
+            <div className="text-2xl font-bold tracking-tight tabular-nums text-brand-blueInk">
+              {summary.openDeals}
+            </div>
+            <div className="mt-1 text-xs text-muted-foreground">{money(summary.pipelineValue)} in pipeline</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="p-4 pb-0">
+            <CardTitle className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Won</CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 pt-1.5">
+            <div className="text-2xl font-bold tracking-tight tabular-nums text-brand-greenInk">
+              {summary.wonDeals}
+            </div>
+            <div className="mt-1 text-xs text-muted-foreground">{money(summary.wonValue)} closed</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="p-4 pb-0">
+            <CardTitle className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Pipeline value
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 pt-1.5">
+            <div className="text-2xl font-bold tracking-tight tabular-nums text-brand-amberInk">
+              {moneyShort(summary.pipelineValue)}
+            </div>
+            <div className="mt-1 text-xs text-muted-foreground">across {summary.openDeals} open deals</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="p-4 pb-0">
+            <CardTitle className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Lost</CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 pt-1.5">
+            <div className="text-2xl font-bold tracking-tight tabular-nums text-brand-redInk">
+              {summary.lostDeals}
+            </div>
+            <div className="mt-1 text-xs text-muted-foreground">closed as lost</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="p-4 pb-0">
+            <CardTitle className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Overdue tasks
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 pt-1.5">
+            <div className="text-2xl font-bold tracking-tight tabular-nums text-brand-redInk">
+              {summary.overdueCount}
+            </div>
+            <div className="mt-1 text-xs text-muted-foreground">needs attention</div>
+          </CardContent>
+        </Card>
       </div>
 
-      <div className="chart-row">
-        <div className="panel">
-          <div className="panel-head">
-            <h2>Deals won</h2>
-            <span className="sub">per month</span>
-          </div>
-          <div className="chart-wrap" style={{ height: 240 }}>
+      <div className="grid gap-4 min-[880px]:grid-cols-2">
+        <Card>
+          <CardHeader className="flex-row items-center gap-3 space-y-0 border-b px-6 py-4">
+            <CardTitle className="text-sm font-semibold">Deals won</CardTitle>
+            <span className="text-xs text-muted-foreground">per month</span>
+          </CardHeader>
+          <div className="px-4 pb-4" style={{ height: 240 }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={wonChartData} margin={{ top: 8, right: 12, bottom: 0, left: -18 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#26262a" />
-                <XAxis dataKey="label" tick={{ fontSize: 11, fill: "#888888" }} axisLine={false} tickLine={false} />
-                <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: "#888888" }} axisLine={false} tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--chart-grid))" />
+                <XAxis
+                  dataKey="label"
+                  tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  allowDecimals={false}
+                  tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                  axisLine={false}
+                  tickLine={false}
+                />
                 <Tooltip
                   cursor={{ fill: "rgba(231,138,83,0.07)" }}
                   formatter={(v: number) => [`${v} deal${v === 1 ? "" : "s"}`, "Won"]}
@@ -106,20 +165,25 @@ export function Dashboard() {
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </div>
-        <div className="panel">
-          <div className="panel-head">
-            <h2>Revenue won</h2>
-            <span className="sub">per month</span>
-          </div>
-          <div className="chart-wrap" style={{ height: 240 }}>
+        </Card>
+        <Card>
+          <CardHeader className="flex-row items-center gap-3 space-y-0 border-b px-6 py-4">
+            <CardTitle className="text-sm font-semibold">Revenue won</CardTitle>
+            <span className="text-xs text-muted-foreground">per month</span>
+          </CardHeader>
+          <div className="px-4 pb-4" style={{ height: 240 }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={revenueChartData} margin={{ top: 8, right: 12, bottom: 0, left: -8 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#26262a" />
-                <XAxis dataKey="label" tick={{ fontSize: 11, fill: "#888888" }} axisLine={false} tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--chart-grid))" />
+                <XAxis
+                  dataKey="label"
+                  tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                  axisLine={false}
+                  tickLine={false}
+                />
                 <YAxis
                   tickFormatter={(v: number) => moneyShort(v)}
-                  tick={{ fontSize: 11, fill: "#888888" }}
+                  tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
                   axisLine={false}
                   tickLine={false}
                   width={56}
@@ -136,42 +200,44 @@ export function Dashboard() {
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </Card>
       </div>
 
-      <div className="detail-grid" style={{ marginTop: 16 }}>
-        <div className="panel">
-          <div className="panel-head">
-            <h2>Recent activity</h2>
-            <span className="sub">across all records</span>
-          </div>
-          <div className="panel-pad">
+      <div className="mt-4 grid items-start gap-4 min-[880px]:grid-cols-[1.4fr_1fr]">
+        <Card>
+          <CardHeader className="flex-row items-center gap-3 space-y-0 border-b px-6 py-4">
+            <CardTitle className="text-sm font-semibold">Recent activity</CardTitle>
+            <span className="text-xs text-muted-foreground">across all records</span>
+          </CardHeader>
+          <CardContent>
             {recentActivities.length === 0 ? (
-              <div className="empty">
-                <Clock />
-                <div className="title">No recent activity</div>
+              <div className="flex flex-col items-center justify-center gap-1 px-6 py-14 text-center text-muted-foreground">
+                <Clock size={34} className="mb-1.5 text-muted-foreground/40" />
+                <div className="text-sm font-medium text-foreground">No recent activity</div>
               </div>
             ) : (
-              <div className="stack">
+              <div className="flex flex-col gap-3.5">
                 {recentActivities.map((a) => (
                   <ActivityFeedRow key={a.id} a={a} />
                 ))}
               </div>
             )}
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
-        <div className="stack">
-          <div className="panel">
-            <div className="panel-head">
-              <h2>Overdue</h2>
-              <span className="sub">{overdueTasks.length} task{overdueTasks.length === 1 ? "" : "s"}</span>
-            </div>
-            <div className="panel-pad">
+        <div className="flex flex-col gap-3.5">
+          <Card>
+            <CardHeader className="flex-row items-center gap-3 space-y-0 border-b px-6 py-4">
+              <CardTitle className="text-sm font-semibold">Overdue</CardTitle>
+              <span className="text-xs text-muted-foreground">
+                {overdueTasks.length} task{overdueTasks.length === 1 ? "" : "s"}
+              </span>
+            </CardHeader>
+            <CardContent>
               {overdueTasks.length === 0 ? (
-                <div className="empty" style={{ padding: "28px 12px" }}>
-                  <Check />
-                  <div className="title">Nothing overdue</div>
+                <div className="flex flex-col items-center justify-center gap-1 px-3 py-7 text-center text-muted-foreground">
+                  <Check size={34} className="mb-1.5 text-muted-foreground/40" />
+                  <div className="text-sm font-medium text-foreground">Nothing overdue</div>
                 </div>
               ) : (
                 <div>
@@ -180,18 +246,18 @@ export function Dashboard() {
                   ))}
                 </div>
               )}
-            </div>
-          </div>
-          <div className="panel">
-            <div className="panel-head">
-              <h2>Upcoming</h2>
-              <span className="sub">next follow-ups</span>
-            </div>
-            <div className="panel-pad">
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex-row items-center gap-3 space-y-0 border-b px-6 py-4">
+              <CardTitle className="text-sm font-semibold">Upcoming</CardTitle>
+              <span className="text-xs text-muted-foreground">next follow-ups</span>
+            </CardHeader>
+            <CardContent>
               {upcomingTasks.length === 0 ? (
-                <div className="empty" style={{ padding: "28px 12px" }}>
-                  <TrendingUp />
-                  <div className="title">No upcoming tasks</div>
+                <div className="flex flex-col items-center justify-center gap-1 px-3 py-7 text-center text-muted-foreground">
+                  <TrendingUp size={34} className="mb-1.5 text-muted-foreground/40" />
+                  <div className="text-sm font-medium text-foreground">No upcoming tasks</div>
                 </div>
               ) : (
                 <div>
@@ -200,8 +266,8 @@ export function Dashboard() {
                   ))}
                 </div>
               )}
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </Page>
@@ -213,23 +279,30 @@ function ActivityFeedRow({ a }: { a: ActivityWithRefs }) {
     a.type === "call" ? <Briefcase size={15} /> : a.type === "email" ? <ArrowUpRight size={15} /> : <DollarSign size={15} />;
   const tone = a.type === "call" ? "blue" : a.type === "email" ? "purple" : "slate";
   return (
-    <div className="row-gap" style={{ alignItems: "flex-start" }}>
-      <div className={`timeline-dot ${a.type}`}>{icon}</div>
-      <div style={{ minWidth: 0, flex: 1 }}>
-        <div className="row-gap" style={{ gap: 8 }}>
-          <span className={`badge badge-${tone}`} style={{ textTransform: "capitalize" }}>
+    <div className="flex flex-wrap items-start gap-2.5">
+      <div className={cn("grid h-[30px] w-[30px] shrink-0 place-items-center rounded-md", FEED_TONE_CLASSES[a.type])}>
+        {icon}
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant={tone} className="capitalize">
             {a.type}
-          </span>
-          <span className="timeline-meta">{relativeTime(a.occurredAt)}</span>
+          </Badge>
+          <span className="text-xs text-muted-foreground">{relativeTime(a.occurredAt)}</span>
         </div>
-        <div className="timeline-desc">{a.description}</div>
-        <div className="timeline-meta">
+        <div className="mt-1 text-sm">{a.description}</div>
+        <div className="mt-1 text-xs text-muted-foreground">
           {a.contactId && (
-            <Link to={`/contacts/${a.contactId}`} className="muted-link">
+            <Link to={`/contacts/${a.contactId}`} className="text-muted-foreground hover:text-foreground">
               {a.contactName}
             </Link>
           )}
-          {a.dealId && <Link to={`/deals/${a.dealId}`} className="muted-link"> · {a.dealName}</Link>}
+          {a.dealId && (
+            <Link to={`/deals/${a.dealId}`} className="text-muted-foreground hover:text-foreground">
+              {" "}
+              · {a.dealName}
+            </Link>
+          )}
         </div>
       </div>
     </div>
@@ -248,25 +321,21 @@ function TaskRow({
   overdue?: boolean;
 }) {
   return (
-    <div className="task-row">
-      <button
-        className={`task-check ${t.done ? "checked" : ""}`}
-        onClick={() => onToggle(t.id)}
+    <div className="flex items-center gap-2.5 border-b border-muted py-3 last:border-b-0">
+      <Checkbox
+        checked={t.done}
+        onCheckedChange={() => onToggle(t.id)}
         disabled={busy === t.id}
         aria-label={t.done ? "Mark not done" : "Mark done"}
-      >
-        {t.done && <Check />}
-      </button>
-      <div className="task-text" style={{ minWidth: 0 }}>
-        <div className={t.done ? "task-text done" : ""} style={{ overflow: "hidden", textOverflow: "ellipsis" }}>
-          {t.description}
-        </div>
-        <div className="timeline-meta">
+      />
+      <div className="min-w-0 flex-1">
+        <div className={cn("truncate text-sm", t.done && "text-muted-foreground line-through")}>{t.description}</div>
+        <div className="text-xs text-muted-foreground">
           {t.contactName && <span>{t.contactName} · </span>}
           {t.dealName && <span>{t.dealName}</span>}
         </div>
       </div>
-      <span className={`task-due ${overdue ? "overdue" : "normal"}`}>Due {formatDateShort(t.dueDate)}</span>
+      <Badge variant={overdue ? "red" : "secondary"}>Due {formatDateShort(t.dueDate)}</Badge>
     </div>
   );
 }

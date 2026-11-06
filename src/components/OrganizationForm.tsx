@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
 import { Modal } from "./Modal";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { api } from "../api";
 import type { Organization } from "../types";
 
@@ -55,34 +59,59 @@ export function OrganizationForm({ open, onClose, onSaved, initial }: Props) {
       onClose={onClose}
       footer={
         <>
-          <button className="btn" onClick={onClose}>
+          <Button type="button" variant="outline" onClick={onClose}>
             Cancel
-          </button>
-          <button className="btn btn-primary" onClick={submit} disabled={saving}>
+          </Button>
+          <Button type="button" variant="default" onClick={submit} disabled={saving}>
             {saving ? "Saving…" : initial ? "Save changes" : "Add organization"}
-          </button>
+          </Button>
         </>
       }
     >
-      <div className="form-grid">
-        {error && <div className="error-box">{error}</div>}
-        <div className="field">
-          <label>Name *</label>
-          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Acme Corp" autoFocus />
-        </div>
-        <div className="form-row">
-          <div className="field">
-            <label>Website</label>
-            <input value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://acme.com" />
+      <div className="grid gap-4">
+        {error && (
+          <div className="rounded-md border border-destructive/20 bg-destructive/10 px-3.5 py-2.5 text-sm text-destructive">
+            {error}
           </div>
-          <div className="field">
-            <label>Industry</label>
-            <input value={industry} onChange={(e) => setIndustry(e.target.value)} placeholder="Software" />
+        )}
+        <div className="grid gap-1.5">
+          <Label htmlFor="org-name">Name *</Label>
+          <Input
+            id="org-name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Acme Corp"
+            autoFocus
+          />
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="grid gap-1.5">
+            <Label htmlFor="org-website">Website</Label>
+            <Input
+              id="org-website"
+              value={website}
+              onChange={(e) => setWebsite(e.target.value)}
+              placeholder="https://acme.com"
+            />
+          </div>
+          <div className="grid gap-1.5">
+            <Label htmlFor="org-industry">Industry</Label>
+            <Input
+              id="org-industry"
+              value={industry}
+              onChange={(e) => setIndustry(e.target.value)}
+              placeholder="Software"
+            />
           </div>
         </div>
-        <div className="field">
-          <label>Notes</label>
-          <textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Anything worth remembering…" />
+        <div className="grid gap-1.5">
+          <Label htmlFor="org-notes">Notes</Label>
+          <Textarea
+            id="org-notes"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Anything worth remembering…"
+          />
         </div>
       </div>
     </Modal>

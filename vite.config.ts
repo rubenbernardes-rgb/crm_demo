@@ -1,3 +1,5 @@
+import { fileURLToPath } from "node:url";
+
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { createApiMiddleware } from "./server/api";
@@ -14,6 +16,11 @@ const apiPlugin = {
 
 export default defineConfig({
   plugins: [react(), apiPlugin],
+  resolve: {
+    alias: {
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
+    },
+  },
   server: {
     host: true,
     port: 5174,

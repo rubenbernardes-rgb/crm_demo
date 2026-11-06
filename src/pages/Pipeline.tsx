@@ -15,7 +15,8 @@ import { useAsync } from "../lib/useAsync";
 import { formatDate, money } from "../lib/format";
 import { STAGES, type DealStage, type DealWithNames } from "../types";
 import { stageStyle } from "../lib/ui";
-import { Page, Loading } from "../components/Page";
+import { Page, Loading, ErrorState } from "../components/Page";
+import { cn } from "@/lib/utils";
 
 export function Pipeline() {
   const { data, loading, error, reload } = useAsync(() => api.deals.list(), []);
@@ -59,10 +60,10 @@ export function Pipeline() {
       {loading ? (
         <Loading />
       ) : error ? (
-        <div className="error-box">{error}</div>
+        <ErrorState message={error} />
       ) : (
         <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
-          <div className="pipeline">
+          <div className="grid gap-3.5 items-stretch overflow-x-auto pb-2 [grid-auto-flow:column] [grid-auto-columns:minmax(252px,1fr)]">
             {STAGES.map((stage) => (
               <Column key={stage} stage={stage} deals={byStage[stage]} />
             ))}
@@ -82,25 +83,25 @@ function Column({ stage, deals }: { stage: DealStage; deals: DealWithNames[] }) 
   const openTotal = deals.reduce((s, d) => s + (d.stage === "Won" || d.stage === "Lost" ? 0 : d.value), 0);
 
   return (
-    <div className={`column ${isOver ? "" : ""}`} ref={setNodeRef}>
-      <div className="column-head">
-        <span className="dot" style={{ background: style.dot }} />
-        <span className="name">{stage}</span>
-        <span className="count">{deals.length}</span>
+    <div className="flex min-h-[120px] flex-col rounded-lg border bg-muted/50" ref={setNodeRef}>
+      <div className="flex items-center gap-2 border-b px-3 py-3">
+        <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: style.dot }} />
+        <span className="text-[13px] font-semibold">{stage}</span>
+        <span className="ml-auto rounded-full border bg-background px-2 py-0.5 text-xs font-semibold text-muted-foreground">
+          {deals.length}
+        </span>
       </div>
-      <div className={`column-body ${isOver ? "drag-over" : ""}`}>
+      <div className={cn("flex min-h-[80px] flex-1 flex-col gap-2 p-2.5", isOver && "bg-primary/5")}>
         {deals.map((d) => (
           <Card key={d.id} deal={d} />
         ))}
         {deals.length === 0 && (
-          <div className="muted" style={{ fontSize: 12, padding: "10px 6px", textAlign: "center" }}>
+          <div className="px-1.5 py-2.5 text-center text-xs text-muted-foreground">
             {stage === "Won" ? "No wins yet" : stage === "Lost" ? "Nothing lost" : "Empty"}
           </div>
         )}
         {openTotal > 0 && (stage !== "Won" && stage !== "Lost") && (
-          <div className="dc-date" style={{ marginTop: 6, fontWeight: 600 }}>
-            {money(openTotal)}
-          </div>
+          <div className="mt-1.5 text-xs font-semibold text-muted-foreground">{money(openTotal)}</div>
         )}
       </div>
     </div>
@@ -111,15 +112,23 @@ function Card({ deal }: { deal: DealWithNames }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id: deal.id });
   const style = {
     transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
-    opacity: isDragging ? 0.4 : 1,
   } as const;
   return (
-    <div className="deal-card" ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <div className="dc-name">{deal.name}</div>
-      <div className="dc-org">{deal.organizationName || "—"}</div>
-      <div className="dc-foot">
-        <span className="dc-value">{money(deal.value)}</span>
-        <span className="dc-date">{formatDate(deal.closeDate)}</span>
+    <div
+      className={cn(
+        "cursor-grab rounded-md border bg-card px-3 py-2.5 shadow-sm transition active:cursor-grabbing",
+        isDragging && "opacity-40"
+      )}
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+    >
+      <div className="mb-1.5 text-[13.5px] font-semibold">{deal.name}</div>
+      <div className="mb-2 truncate text-xs text-muted-foreground">{deal.organizationName || "—"}</div>
+      <div className="flex items-center justify-between gap-2">
+        <span className="font-bold tabular-nums">{money(deal.value)}</span>
+        <span className="text-xs text-muted-foreground">{formatDate(deal.closeDate)}</span>
       </div>
     </div>
   );
@@ -127,12 +136,12 @@ function Card({ deal }: { deal: DealWithNames }) {
 
 function DraggedCard({ deal }: { deal: DealWithNames }) {
   return (
-    <div className="deal-card" style={{ boxShadow: "var(--shadow-lg)", cursor: "grabbing" }}>
-      <div className="dc-name">{deal.name}</div>
-      <div className="dc-org">{deal.organizationName || "—"}</div>
-      <div className="dc-foot">
-        <span className="dc-value">{money(deal.value)}</span>
-        <span className="dc-date">{formatDate(deal.closeDate)}</span>
+    <div className="cursor-grabbing rounded-md border bg-card px-3 py-2.5 shadow-lg transition">
+      <div className="mb-1.5 text-[13.5px] font-semibold">{deal.name}</div>
+      <div className="mb-2 truncate text-xs text-muted-foreground">{deal.organizationName || "—"}</div>
+      <div className="flex items-center justify-between gap-2">
+        <span className="font-bold tabular-nums">{money(deal.value)}</span>
+        <span className="text-xs text-muted-foreground">{formatDate(deal.closeDate)}</span>
       </div>
     </div>
   );

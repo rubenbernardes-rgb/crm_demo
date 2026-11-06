@@ -4,12 +4,14 @@ import { Building2, Pencil, Plus, Trash2, User } from "lucide-react";
 import { api } from "../api";
 import { useAsync } from "../lib/useAsync";
 import { formatDate, money } from "../lib/format";
-import { Page, Loading } from "../components/Page";
+import { Page, Loading, ErrorState } from "../components/Page";
 import { StageBadge } from "../components/Badge";
 import { DealForm } from "../components/DealForm";
 import { ConfirmDialog } from "../components/ConfirmDialog";
 import { ActivityForm } from "../components/ActivityForm";
 import { ActivityTimeline } from "../components/ActivityTimeline";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function DealDetail() {
   const { id = "" } = useParams();
@@ -31,7 +33,7 @@ export function DealDetail() {
   if (error || !data)
     return (
       <Page title="Deal" back={{ to: "/deals", label: "Deals" }}>
-        <div className="error-box">{error ?? "Deal not found"}</div>
+        <ErrorState message={error ?? "Deal not found"} />
       </Page>
     );
 
@@ -50,76 +52,74 @@ export function DealDetail() {
       back={{ to: "/deals", label: "Deals" }}
       actions={
         <>
-          <button className="btn" onClick={() => setActOpen(true)}>
+          <Button variant="outline" onClick={() => setActOpen(true)}>
             <Plus size={15} /> Log activity
-          </button>
-          <button className="btn" onClick={() => setFormOpen(true)}>
+          </Button>
+          <Button variant="outline" onClick={() => setFormOpen(true)}>
             <Pencil size={15} /> Edit
-          </button>
-          <button className="btn btn-danger" onClick={() => setConfirming(true)}>
+          </Button>
+          <Button variant="destructive" onClick={() => setConfirming(true)}>
             <Trash2 size={15} /> Delete
-          </button>
+          </Button>
         </>
       }
     >
-      <div className="detail-grid">
-        <div className="panel">
-          <div className="panel-head">
-            <h2>Deal details</h2>
-            <div className="right">
+      <div className="grid items-start gap-4 min-[880px]:grid-cols-[1.4fr_1fr]">
+        <Card>
+          <CardHeader className="flex-row items-center justify-between gap-3 space-y-0 border-b px-6 py-4">
+            <CardTitle className="text-sm font-semibold">Deal details</CardTitle>
+            <div className="ml-auto flex items-center gap-2">
               <StageBadge stage={deal.stage} />
             </div>
-          </div>
-          <div className="panel-pad">
-            <dl className="kv">
-              <dt>Value</dt>
-              <dd className="row-title" style={{ fontSize: 17, fontVariantNumeric: "tabular-nums" }}>
-                {money(deal.value)}
-              </dd>
-              <dt>Close date</dt>
-              <dd>{formatDate(deal.closeDate)}</dd>
-              <dt>Organization</dt>
-              <dd>
+          </CardHeader>
+          <CardContent>
+            <dl className="grid grid-cols-[120px_1fr] gap-x-4 gap-y-2.5 text-sm">
+              <dt className="font-medium text-muted-foreground">Value</dt>
+              <dd className="m-0 text-[17px] font-medium tabular-nums">{money(deal.value)}</dd>
+              <dt className="font-medium text-muted-foreground">Close date</dt>
+              <dd className="m-0">{formatDate(deal.closeDate)}</dd>
+              <dt className="font-medium text-muted-foreground">Organization</dt>
+              <dd className="m-0">
                 {organization ? (
-                  <Link to={`/organizations/${organization.id}`} className="link">
-                    <Building2 size={13} style={{ verticalAlign: "middle", marginRight: 5 }} />
+                  <Link to={`/organizations/${organization.id}`} className="font-medium text-primary hover:underline">
+                    <Building2 size={13} className="mr-1 inline align-middle" />
                     {organization.name}
                   </Link>
                 ) : (
-                  <span className="muted">—</span>
+                  <span className="text-muted-foreground">—</span>
                 )}
               </dd>
-              <dt>Primary contact</dt>
-              <dd>
+              <dt className="font-medium text-muted-foreground">Primary contact</dt>
+              <dd className="m-0">
                 {contact ? (
-                  <Link to={`/contacts/${contact.id}`} className="link">
-                    <User size={13} style={{ verticalAlign: "middle", marginRight: 5 }} />
+                  <Link to={`/contacts/${contact.id}`} className="font-medium text-primary hover:underline">
+                    <User size={13} className="mr-1 inline align-middle" />
                     {contact.name}
                   </Link>
                 ) : (
-                  <span className="muted">—</span>
+                  <span className="text-muted-foreground">—</span>
                 )}
               </dd>
-              <dt>Added</dt>
-              <dd>{formatDate(deal.createdAt)}</dd>
+              <dt className="font-medium text-muted-foreground">Added</dt>
+              <dd className="m-0">{formatDate(deal.createdAt)}</dd>
             </dl>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
-        <div className="panel">
-          <div className="panel-head">
-            <h2>Activity</h2>
-            <span className="sub">{activities.length}</span>
-            <div className="right">
-              <button className="btn btn-ghost btn-sm" onClick={() => setActOpen(true)}>
+        <Card>
+          <CardHeader className="flex-row items-center justify-between gap-3 space-y-0 border-b px-6 py-4">
+            <CardTitle className="text-sm font-semibold">Activity</CardTitle>
+            <span className="text-xs text-muted-foreground">{activities.length}</span>
+            <div className="ml-auto flex items-center gap-2">
+              <Button variant="ghost" size="sm" onClick={() => setActOpen(true)}>
                 <Plus size={14} /> Log
-              </button>
+              </Button>
             </div>
-          </div>
-          <div className="panel-pad">
+          </CardHeader>
+          <CardContent>
             <ActivityTimeline activities={activities} onChange={reload} />
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
 
       <DealForm

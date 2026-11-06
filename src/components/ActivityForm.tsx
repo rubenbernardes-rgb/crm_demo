@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
 import { Modal } from "./Modal";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { api } from "../api";
 import type { ActivityType } from "../types";
 
@@ -79,56 +85,76 @@ export function ActivityForm({ open, onClose, contactId, dealId, onCreated }: Ac
       onClose={onClose}
       footer={
         <>
-          <button className="btn" onClick={onClose}>
+          <Button type="button" variant="outline" onClick={onClose}>
             Cancel
-          </button>
-          <button className="btn btn-primary" onClick={submit} disabled={saving}>
+          </Button>
+          <Button type="button" variant="default" onClick={submit} disabled={saving}>
             {saving ? "Saving…" : "Save activity"}
-          </button>
+          </Button>
         </>
       }
     >
-      <div className="form-grid">
-        {error && <div className="error-box">{error}</div>}
-        <div className="form-row">
-          <div className="field">
-            <label>Type</label>
-            <select value={type} onChange={(e) => setType(e.target.value as ActivityType)}>
-              {TYPES.map((t) => (
-                <option key={t.value} value={t.value}>
-                  {t.label}
-                </option>
-              ))}
-            </select>
+      <div className="grid gap-4">
+        {error && (
+          <div className="rounded-md border border-destructive/20 bg-destructive/10 px-3.5 py-2.5 text-sm text-destructive">
+            {error}
           </div>
-          <div className="field">
-            <label>When</label>
-            <input
+        )}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="grid gap-1.5">
+            <Label>Type</Label>
+            <Select value={type} onValueChange={(v) => setType(v as ActivityType)}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {TYPES.map((t) => (
+                  <SelectItem key={t.value} value={t.value}>
+                    {t.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="grid gap-1.5">
+            <Label htmlFor="activity-when">When</Label>
+            <Input
+              id="activity-when"
               type="datetime-local"
               value={occurredAt}
               onChange={(e) => setOccurredAt(e.target.value)}
             />
           </div>
         </div>
-        <div className="field">
-          <label>Description</label>
-          <textarea
+        <div className="grid gap-1.5">
+          <Label htmlFor="activity-description">Description</Label>
+          <Textarea
+            id="activity-description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="What happened?"
           />
         </div>
-        <div className="form-row">
-          <div className="field">
-            <label>Follow-up due date</label>
-            <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
-            <span className="hint">Optional — turns this into a task on the dashboard.</span>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="grid gap-1.5">
+            <Label htmlFor="activity-due">Follow-up due date</Label>
+            <Input
+              id="activity-due"
+              type="date"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+            />
+            <span className="text-xs text-muted-foreground">
+              Optional — turns this into a task on the dashboard.
+            </span>
           </div>
-          <div className="field" style={{ justifyContent: "flex-end" }}>
-            <label className="checkbox">
-              <input type="checkbox" checked={done} onChange={(e) => setDone(e.target.checked)} />
-              Already done
-            </label>
+          <div className="flex items-end justify-end gap-2 pb-1.5">
+            <Checkbox
+              id="activity-done"
+              checked={done}
+              onCheckedChange={(v) => setDone(v === true)}
+            />
+            <Label htmlFor="activity-done">Already done</Label>
           </div>
         </div>
       </div>
