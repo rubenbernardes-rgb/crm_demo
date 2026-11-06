@@ -1,0 +1,39 @@
+shot: 01-dashboard
+shot: 02-dashboard-task-toggled
+ok: dashboard: toggle first task done (leaves list) + restore
+shot: 03-organizations
+shot: 04-organizations-search-coho
+ok: organizations: search narrows
+shot: 05-org-add-dialog
+ok: organizations: Add organization dialog
+shot: 06-organization-detail
+ok: organizations: open org detail (click row)
+shot: 07-org-edit-dialog
+ok: organization detail: Edit dialog
+shot: 08-org-delete-confirm
+ok: organization detail: ConfirmDialog (delete) — cancel
+shot: 09-contacts
+shot: 10-contacts-filter-leads
+ok: contacts: filter tab Leads
+shot: 11-contact-add-dialog
+ok: contacts: Add contact dialog
+shot: 12-contact-detail
+ok: contacts: open contact detail (click row)
+shot: 13-activity-dialog
+ok: contact detail: Log activity dialog
+ok: contact detail: timeline task toggle flips in place + restore
+shot: 14-deals
+shot: 15-deals-filter-proposal
+ok: deals: stage filter Select → Proposal
+shot: 16-deal-add-dialog
+ok: deals: Add deal dialog
+shot: 17-deal-detail
+ok: deals: open deal detail (click row)
+shot: 18-deal-activity-dialog
+ok: deal detail: Log activity dialog
+shot: 19-pipeline
+shot: 20-pipeline-dragging-done
+shot: 21-pipeline-after-drag
+ok: pipeline: drag Pilot program New → Qualified
+shot: 22-pipeline-restored
+ok: pipeline: drag Pilot program Qualified → New (restore)
