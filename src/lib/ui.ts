@@ -5,13 +5,15 @@ export interface StageStyle {
   dot: string; // hex for the dot/swatch
 }
 
+// Darkmatter theme palette. Won/Lost are legible green/red constants
+// that read well on both the light and dark surfaces.
 const STAGE_STYLES: Record<DealStage, StageStyle> = {
-  New: { badge: "badge-blue", dot: "#209dd7" },
-  Qualified: { badge: "badge-purple", dot: "#753991" },
-  Proposal: { badge: "badge-amber", dot: "#ecad0a" },
-  Negotiation: { badge: "badge-slate", dot: "#525c6b" },
+  New: { badge: "badge-blue", dot: "#5f8787" },
+  Qualified: { badge: "badge-purple", dot: "#527575" },
+  Proposal: { badge: "badge-amber", dot: "#e78a53" },
+  Negotiation: { badge: "badge-slate", dot: "#888888" },
   Won: { badge: "badge-green", dot: "#1f9d55" },
-  Lost: { badge: "badge-red", dot: "#d83a3a" },
+  Lost: { badge: "badge-red", dot: "#ef4444" },
 };
 
 export function stageStyle(stage: DealStage): StageStyle {
