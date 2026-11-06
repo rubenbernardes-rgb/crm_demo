@@ -65,3 +65,14 @@
     @apply bg-background text-foreground antialiased;
   }
 }
+
+/* Recharts tooltip polish — ported from the legacy stylesheet, adapted to tokens. */
+.recharts-default-tooltip {
+  border-radius: 8px !important;
+  border: 1px solid hsl(var(--border)) !important;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.08) !important;
+  font-size: 12px !important;
+}
+.recharts-tooltip-label {
+  color: hsl(var(--muted-foreground)) !important;
+}

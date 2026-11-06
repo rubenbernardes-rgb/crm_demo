@@ -9,6 +9,18 @@ import { Page, Loading } from "../components/Page";
 import { ContactForm } from "../components/ContactForm";
 import { ConfirmDialog } from "../components/ConfirmDialog";
 import { StatusBadge } from "../components/Badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 type Filter = ContactStatus | "all";
 const FILTERS: { value: Filter; label: string }[] = [
@@ -45,102 +57,113 @@ export function Contacts() {
     <Page
       title="Contacts"
       actions={
-        <button className="btn btn-primary" onClick={openAdd}>
+        <Button onClick={openAdd}>
           <Plus size={15} /> Add contact
-        </button>
+        </Button>
       }
     >
-      <div className="toolbar">
-        <div className="search">
-          <Search />
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by name, email, phone or title…" />
+      <div className="mb-4 flex flex-wrap items-center gap-3">
+        <div className="relative min-w-[220px] max-w-[420px] flex-1">
+          <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            className="pl-8"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search by name, email, phone or title…"
+          />
         </div>
-        <div className="segmented">
-          {FILTERS.map((f) => (
-            <button
-              key={f.value}
-              className={status === f.value ? "active" : ""}
-              onClick={() => setStatus(f.value)}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
+        <Tabs value={status} onValueChange={(v) => setStatus(v as Filter)}>
+          <TabsList>
+            {FILTERS.map((f) => (
+              <TabsTrigger key={f.value} value={f.value}>
+                {f.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
       </div>
 
-      <div className="panel">
+      <Card className="overflow-hidden">
         {loading ? (
           <Loading />
         ) : error ? (
-          <div className="error-box" style={{ margin: 16 }}>
+          <div className="m-4 rounded-md border border-destructive/20 bg-destructive/10 px-3.5 py-2.5 text-sm text-destructive">
             {error}
           </div>
         ) : (
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Contact</th>
-                  <th>Title</th>
-                  <th>Organization</th>
-                  <th>Status</th>
-                  <th className="cell-actions">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data && data.length > 0 ? (
-                  data.map((c) => (
-                    <tr key={c.id} onClick={() => navigate(`/contacts/${c.id}`)}>
-                      <td>
-                        <div className="row-title">{c.name}</div>
-                        <div className="row-sub">{c.email || "—"}</div>
-                      </td>
-                      <td>{c.title || <span className="muted">—</span>}</td>
-                      <td>{c.organizationName || <span className="muted">—</span>}</td>
-                      <td>
-                        <StatusBadge status={c.status} />
-                      </td>
-                      <td className="cell-actions">
-                        <button
-                          className="btn btn-ghost btn-icon"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setEditing(c);
-                            setFormOpen(true);
-                          }}
-                          aria-label="Edit"
-                        >
-                          <Pencil />
-                        </button>
-                        <button
-                          className="btn btn-ghost btn-icon"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setDeleting(c);
-                          }}
-                          aria-label="Delete"
-                        >
-                          <Trash2 />
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={5}>
-                      <div className="empty">
-                        <Users />
-                        <div className="title">No contacts found</div>
-                        <div className="sub">{q || status !== "all" ? "Try clearing the filters." : "Add your first contact."}</div>
+          <Table>
+            <TableHeader>
+              <TableRow className="hover:bg-transparent">
+                <TableHead className="bg-muted/50 px-4 text-xs uppercase tracking-wide">Contact</TableHead>
+                <TableHead className="bg-muted/50 px-4 text-xs uppercase tracking-wide">Title</TableHead>
+                <TableHead className="bg-muted/50 px-4 text-xs uppercase tracking-wide">Organization</TableHead>
+                <TableHead className="bg-muted/50 px-4 text-xs uppercase tracking-wide">Status</TableHead>
+                <TableHead className="bg-muted/50 px-4 text-right text-xs uppercase tracking-wide">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {data && data.length > 0 ? (
+                data.map((c) => (
+                  <TableRow key={c.id} className="cursor-pointer" onClick={() => navigate(`/contacts/${c.id}`)}>
+                    <TableCell className="px-4 py-3">
+                      <div className="font-medium text-foreground">{c.name}</div>
+                      <div className="text-xs text-muted-foreground">{c.email || "—"}</div>
+                    </TableCell>
+                    <TableCell className="px-4 py-3">
+                      {c.title || <span className="text-muted-foreground">—</span>}
+                    </TableCell>
+                    <TableCell className="px-4 py-3">
+                      {c.organizationName || <span className="text-muted-foreground">—</span>}
+                    </TableCell>
+                    <TableCell className="px-4 py-3">
+                      <StatusBadge status={c.status} />
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap px-4 py-3 text-right">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="ml-1"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditing(c);
+                          setFormOpen(true);
+                        }}
+                        aria-label="Edit"
+                      >
+                        <Pencil />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="ml-1"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDeleting(c);
+                        }}
+                        aria-label="Delete"
+                      >
+                        <Trash2 />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={5}>
+                    <div className="flex flex-col items-center justify-center gap-1 px-6 py-14 text-center text-muted-foreground">
+                      <Users size={34} className="mb-1.5 text-muted-foreground/40" />
+                      <div className="text-sm font-medium text-foreground">No contacts found</div>
+                      <div className="text-xs">
+                        {q || status !== "all" ? "Try clearing the filters." : "Add your first contact."}
                       </div>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
         )}
-      </div>
+      </Card>
 
       <ContactForm
         open={formOpen}

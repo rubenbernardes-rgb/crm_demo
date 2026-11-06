@@ -4,10 +4,13 @@ import { ExternalLink, Pencil, Plus, Trash2 } from "lucide-react";
 import { api } from "../api";
 import { useAsync } from "../lib/useAsync";
 import { formatDate, money } from "../lib/format";
-import { Page, Loading } from "../components/Page";
+import { Page, Loading, ErrorState } from "../components/Page";
 import { StageBadge, StatusBadge } from "../components/Badge";
 import { OrganizationForm } from "../components/OrganizationForm";
 import { ConfirmDialog } from "../components/ConfirmDialog";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 export function OrganizationDetail() {
   const { id = "" } = useParams();
@@ -25,7 +28,7 @@ export function OrganizationDetail() {
   if (error || !data)
     return (
       <Page title="Organization" back={{ to: "/organizations", label: "Organizations" }}>
-        <div className="error-box">{error ?? "Organization not found"}</div>
+        <ErrorState message={error ?? "Organization not found"} />
       </Page>
     );
 
@@ -44,72 +47,72 @@ export function OrganizationDetail() {
       back={{ to: "/organizations", label: "Organizations" }}
       actions={
         <>
-          <button className="btn" onClick={() => setFormOpen(true)}>
+          <Button variant="outline" onClick={() => setFormOpen(true)}>
             <Pencil size={15} /> Edit
-          </button>
-          <button className="btn btn-danger" onClick={() => setConfirming(true)}>
+          </Button>
+          <Button variant="destructive" onClick={() => setConfirming(true)}>
             <Trash2 size={15} /> Delete
-          </button>
+          </Button>
         </>
       }
     >
-      <div className="detail-grid">
-        <div className="panel">
-          <div className="panel-head">
-            <h2>Overview</h2>
-          </div>
-          <div className="panel-pad">
-            <dl className="kv">
-              <dt>Website</dt>
-              <dd>
+      <div className="grid items-start gap-4 min-[880px]:grid-cols-[1.4fr_1fr]">
+        <Card>
+          <CardHeader className="flex-row items-center gap-3 space-y-0 border-b px-6 py-4">
+            <CardTitle className="text-sm font-semibold">Overview</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <dl className="grid grid-cols-[120px_1fr] gap-x-4 gap-y-2.5 text-sm">
+              <dt className="font-medium text-muted-foreground">Website</dt>
+              <dd className="m-0">
                 {org.website ? (
-                  <a href={org.website} target="_blank" rel="noreferrer" className="link">
-                    {org.website.replace(/^https?:\/\//, "")} <ExternalLink size={12} style={{ verticalAlign: "middle" }} />
+                  <a href={org.website} target="_blank" rel="noreferrer" className="font-medium text-primary hover:underline">
+                    {org.website.replace(/^https?:\/\//, "")} <ExternalLink size={12} className="inline align-middle" />
                   </a>
                 ) : (
-                  <span className="muted">—</span>
+                  <span className="text-muted-foreground">—</span>
                 )}
               </dd>
-              <dt>Industry</dt>
-              <dd>{org.industry || <span className="muted">—</span>}</dd>
-              <dt>Contacts</dt>
-              <dd>{contacts.length}</dd>
-              <dt>Open deals</dt>
-              <dd>{deals.filter((d) => d.stage !== "Won" && d.stage !== "Lost").length}</dd>
+              <dt className="font-medium text-muted-foreground">Industry</dt>
+              <dd className="m-0">{org.industry || <span className="text-muted-foreground">—</span>}</dd>
+              <dt className="font-medium text-muted-foreground">Contacts</dt>
+              <dd className="m-0">{contacts.length}</dd>
+              <dt className="font-medium text-muted-foreground">Open deals</dt>
+              <dd className="m-0">{deals.filter((d) => d.stage !== "Won" && d.stage !== "Lost").length}</dd>
             </dl>
             {org.notes && (
               <>
-                <div className="divider" />
-                <div className="section-title">Notes</div>
-                <p className="row-sub" style={{ whiteSpace: "pre-wrap", marginTop: 0 }}>
-                  {org.notes}
-                </p>
+                <Separator className="my-4" />
+                <div className="mb-3 text-sm font-semibold">Notes</div>
+                <p className="whitespace-pre-wrap text-xs text-muted-foreground">{org.notes}</p>
               </>
             )}
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
-        <div className="stack">
-          <div className="panel">
-            <div className="panel-head">
-              <h2>Contacts</h2>
-              <span className="sub">{contacts.length}</span>
-              <div className="right">
-                <Link to="/contacts" className="btn btn-ghost btn-sm">
-                  <Plus size={14} /> Add
-                </Link>
+        <div className="flex flex-col gap-3.5">
+          <Card>
+            <CardHeader className="flex-row items-center justify-between gap-3 space-y-0 border-b px-6 py-4">
+              <CardTitle className="text-sm font-semibold">Contacts</CardTitle>
+              <span className="text-xs text-muted-foreground">{contacts.length}</span>
+              <div className="ml-auto flex items-center gap-2">
+                <Button variant="ghost" size="sm" asChild>
+                  <Link to="/contacts">
+                    <Plus size={14} /> Add
+                  </Link>
+                </Button>
               </div>
-            </div>
-            <div className="panel-pad">
+            </CardHeader>
+            <CardContent>
               {contacts.length === 0 ? (
-                <div className="muted">No contacts yet.</div>
+                <div className="text-muted-foreground">No contacts yet.</div>
               ) : (
-                <div className="stack">
+                <div className="flex flex-col gap-3.5">
                   {contacts.map((c) => (
-                    <Link key={c.id} to={`/contacts/${c.id}`} className="row-gap" style={{ alignItems: "center" }}>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div className="row-title">{c.name}</div>
-                        <div className="row-sub">
+                    <Link key={c.id} to={`/contacts/${c.id}`} className="flex flex-wrap items-center gap-2.5">
+                      <div className="min-w-0 flex-1">
+                        <div className="font-medium text-foreground">{c.name}</div>
+                        <div className="text-xs text-muted-foreground">
                           {c.title || "—"} · {c.email}
                         </div>
                       </div>
@@ -118,37 +121,35 @@ export function OrganizationDetail() {
                   ))}
                 </div>
               )}
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          <div className="panel">
-            <div className="panel-head">
-              <h2>Deals</h2>
-              <span className="sub">{deals.length}</span>
-            </div>
-            <div className="panel-pad">
+          <Card>
+            <CardHeader className="flex-row items-center justify-between gap-3 space-y-0 border-b px-6 py-4">
+              <CardTitle className="text-sm font-semibold">Deals</CardTitle>
+              <span className="text-xs text-muted-foreground">{deals.length}</span>
+            </CardHeader>
+            <CardContent>
               {deals.length === 0 ? (
-                <div className="muted">No deals yet.</div>
+                <div className="text-muted-foreground">No deals yet.</div>
               ) : (
-                <div className="stack">
+                <div className="flex flex-col gap-3.5">
                   {deals.map((d) => (
-                    <Link key={d.id} to={`/deals/${d.id}`} className="row-gap" style={{ alignItems: "center" }}>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div className="row-title">{d.name}</div>
-                        <div className="row-sub">
+                    <Link key={d.id} to={`/deals/${d.id}`} className="flex flex-wrap items-center gap-2.5">
+                      <div className="min-w-0 flex-1">
+                        <div className="font-medium text-foreground">{d.name}</div>
+                        <div className="text-xs text-muted-foreground">
                           {d.contactName || "—"} · close {formatDate(d.closeDate)}
                         </div>
                       </div>
                       <StageBadge stage={d.stage} />
-                      <div className="row-title" style={{ fontVariantNumeric: "tabular-nums" }}>
-                        {money(d.value)}
-                      </div>
+                      <div className="font-medium tabular-nums text-foreground">{money(d.value)}</div>
                     </Link>
                   ))}
                 </div>
               )}
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
 
