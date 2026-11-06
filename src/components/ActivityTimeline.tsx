@@ -1,15 +1,31 @@
 import { useState } from "react";
-import { Mail, Phone, StickyNote, Trash2, Check } from "lucide-react";
+import { Mail, Phone, StickyNote, Trash2 } from "lucide-react";
 import type { ActivityType, ActivityWithRefs } from "../types";
 import { ACTIVITY_STYLES } from "../lib/ui";
 import { formatDateShort, formatDateTime, todayISO } from "../lib/format";
 import { api } from "../api";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { cn } from "@/lib/utils";
 
 const ICONS: Record<ActivityType, typeof StickyNote> = {
   note: StickyNote,
   call: Phone,
   email: Mail,
 };
+
+const TONE_CLASSES: Record<ActivityType, string> = {
+  note: "bg-muted text-muted-foreground",
+  call: "bg-brand-blue/10 text-brand-blueInk",
+  email: "bg-brand-purple/10 text-brand-purpleInk",
+};
+
+const DUE_VARIANTS = {
+  overdue: "red",
+  soon: "amber",
+  normal: "secondary",
+} as const;
 
 function dueTone(due: string, done: boolean): "overdue" | "soon" | "normal" {
   if (done) return "normal";
@@ -50,60 +66,72 @@ export function ActivityTimeline({ activities, onChange }: TimelineProps) {
 
   if (activities.length === 0) {
     return (
-      <div className="empty">
-        <StickyNote />
-        <div className="title">No activity yet</div>
-        <div className="sub">Log a call, note or email to start a timeline.</div>
+      <div className="flex flex-col items-center justify-center gap-1.5 py-14 text-center text-muted-foreground">
+        <StickyNote size={24} />
+        <div className="text-sm font-medium">No activity yet</div>
+        <div className="text-xs">Log a call, note or email to start a timeline.</div>
       </div>
     );
   }
 
   return (
-    <div className="timeline">
+    <div>
       {activities.map((a) => {
         const Icon = ICONS[a.type];
         const style = ACTIVITY_STYLES[a.type];
         return (
-          <div className="timeline-item" key={a.id}>
-            <div className={`timeline-dot ${style.dot}`}>
+          <div className="group flex gap-3 border-b border-muted py-3.5 last:border-b-0" key={a.id}>
+            <div
+              className={cn(
+                "grid h-[30px] w-[30px] shrink-0 place-items-center rounded-md",
+                TONE_CLASSES[a.type]
+              )}
+            >
               <Icon size={15} />
             </div>
-            <div className="timeline-body">
-              <div className="timeline-top">
-                <span className={`badge badge-${a.type === "call" ? "blue" : a.type === "email" ? "purple" : "slate"}`}>
-                  {style.label}
-                </span>
-                <span className="timeline-meta">{formatDateTime(a.occurredAt)}</span>
-                <div style={{ marginLeft: "auto", display: "flex", gap: 8, alignItems: "center" }}>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <Badge variant={style.tone}>{style.label}</Badge>
+                <span className="text-xs text-muted-foreground">{formatDateTime(a.occurredAt)}</span>
+                <div className="ml-auto flex items-center gap-2">
                   {a.dueDate && (
-                    <span className={`task-due ${dueTone(a.dueDate, a.done)}`}>
+                    <Badge variant={DUE_VARIANTS[dueTone(a.dueDate, a.done)]}>
                       {a.done ? "Was due" : "Due"} {formatDateShort(a.dueDate)}
-                    </span>
+                    </Badge>
                   )}
                   {a.dueDate && (
-                    <button
-                      className="task-check"
-                      onClick={() => toggle(a.id)}
+                    <Checkbox
+                      checked={a.done}
+                      onCheckedChange={() => toggle(a.id)}
+                      disabled={busy === a.id}
                       aria-label={a.done ? "Mark not done" : "Mark done"}
-                      style={busy === a.id ? { opacity: 0.5 } : undefined}
-                    >
-                      {a.done && <Check />}
-                    </button>
+                      className={cn(busy === a.id && "opacity-50")}
+                    />
                   )}
-                  <button
-                    className="btn btn-ghost btn-icon task-delete"
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => remove(a.id)}
                     aria-label="Delete activity"
+                    className={cn(
+                      "h-8 w-8 text-muted-foreground hover:text-destructive",
+                      "opacity-0 transition-opacity group-hover:opacity-100"
+                    )}
                   >
                     <Trash2 />
-                  </button>
+                  </Button>
                 </div>
               </div>
-              <div className="timeline-desc" style={a.done ? { color: "var(--muted)", textDecoration: "line-through" } : undefined}>
+              <div
+                className={cn(
+                  "mt-1 text-sm",
+                  a.done && "text-muted-foreground line-through"
+                )}
+              >
                 {a.description}
               </div>
               {(a.contactName || a.dealName) && (
-                <div className="timeline-meta" style={{ marginTop: 4 }}>
+                <div className="mt-1 text-xs text-muted-foreground">
                   {a.contactName && <span>· {a.contactName}</span>}
                   {a.dealName && <span> · deal: {a.dealName}</span>}
                 </div>

@@ -15,6 +15,12 @@
     "jsx": "react-jsx",
     "types": ["node", "vitest/globals"],
 
+    /* Paths */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
@@ -22,5 +28,12 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src", "server", "tests", "vite.config.ts", "vitest.config.ts"]
+  "include": [
+    "src",
+    "server",
+    "tests",
+    "vite.config.ts",
+    "vitest.config.ts",
+    "tailwind.config.ts"
+  ]
 }

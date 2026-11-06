@@ -1,4 +1,5 @@
 import { Modal } from "./Modal";
+import { Button } from "@/components/ui/button";
 
 interface ConfirmProps {
   open: boolean;
@@ -25,16 +26,16 @@ export function ConfirmDialog({
       onClose={onCancel}
       footer={
         <>
-          <button className="btn" onClick={onCancel}>
+          <Button variant="outline" onClick={onCancel}>
             Cancel
-          </button>
-          <button className="btn btn-danger" onClick={onConfirm}>
+          </Button>
+          <Button variant="destructive" onClick={onConfirm}>
             {confirmLabel}
-          </button>
+          </Button>
         </>
       }
     >
-      <p style={{ margin: 0, color: "var(--muted)", fontSize: 13.5 }}>{message}</p>
+      <p className="text-sm text-muted-foreground">{message}</p>
     </Modal>
   );
 }

@@ -1,5 +1,15 @@
 import { useEffect, useState } from "react";
 import { Modal } from "./Modal";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { api } from "../api";
 import type { Contact, ContactStatus, Organization } from "../types";
 
@@ -74,58 +84,97 @@ export function ContactForm({ open, onClose, onSaved, organizations, initial, de
       onClose={onClose}
       footer={
         <>
-          <button className="btn" onClick={onClose}>
+          <Button type="button" variant="outline" onClick={onClose}>
             Cancel
-          </button>
-          <button className="btn btn-primary" onClick={submit} disabled={saving}>
+          </Button>
+          <Button type="button" variant="default" onClick={submit} disabled={saving}>
             {saving ? "Saving…" : initial ? "Save changes" : "Add contact"}
-          </button>
+          </Button>
         </>
       }
     >
-      <div className="form-grid">
-        {error && <div className="error-box">{error}</div>}
-        <div className="form-row">
-          <div className="field">
-            <label>Name *</label>
-            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Jane Doe" autoFocus />
+      <div className="grid gap-4">
+        {error && (
+          <div className="rounded-md border border-destructive/20 bg-destructive/10 px-3.5 py-2.5 text-sm text-destructive">
+            {error}
           </div>
-          <div className="field">
-            <label>Job title</label>
-            <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="VP Sales" />
+        )}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="grid gap-1.5">
+            <Label htmlFor="contact-name">Name *</Label>
+            <Input
+              id="contact-name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Jane Doe"
+              autoFocus
+            />
+          </div>
+          <div className="grid gap-1.5">
+            <Label htmlFor="contact-title">Job title</Label>
+            <Input
+              id="contact-title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="VP Sales"
+            />
           </div>
         </div>
-        <div className="form-row">
-          <div className="field">
-            <label>Email</label>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="jane@acme.com" />
+        <div className="grid grid-cols-2 gap-4">
+          <div className="grid gap-1.5">
+            <Label htmlFor="contact-email">Email</Label>
+            <Input
+              id="contact-email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="jane@acme.com"
+            />
           </div>
-          <div className="field">
-            <label>Phone</label>
-            <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+1 555 0100" />
+          <div className="grid gap-1.5">
+            <Label htmlFor="contact-phone">Phone</Label>
+            <Input
+              id="contact-phone"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="+1 555 0100"
+            />
           </div>
         </div>
-        <div className="form-row">
-          <div className="field">
-            <label>Organization</label>
-            <select value={organizationId} onChange={(e) => setOrganizationId(e.target.value)}>
-              <option value="">— None —</option>
-              {organizations.map((o) => (
-                <option key={o.id} value={o.id}>
-                  {o.name}
-                </option>
-              ))}
-            </select>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="grid gap-1.5">
+            <Label>Organization</Label>
+            <Select
+              value={organizationId || "none"}
+              onValueChange={(v) => setOrganizationId(v === "none" ? "" : v)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="— None —" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">— None —</SelectItem>
+                {organizations.map((o) => (
+                  <SelectItem key={o.id} value={o.id}>
+                    {o.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          <div className="field">
-            <label>Status</label>
-            <select value={status} onChange={(e) => setStatus(e.target.value as ContactStatus)}>
-              {STATUSES.map((s) => (
-                <option key={s.value} value={s.value}>
-                  {s.label}
-                </option>
-              ))}
-            </select>
+          <div className="grid gap-1.5">
+            <Label>Status</Label>
+            <Select value={status} onValueChange={(v) => setStatus(v as ContactStatus)}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {STATUSES.map((s) => (
+                  <SelectItem key={s.value} value={s.value}>
+                    {s.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>
