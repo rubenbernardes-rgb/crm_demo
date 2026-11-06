@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 const srcDir = fileURLToPath(new URL("../src", import.meta.url));
+const rootDir = fileURLToPath(new URL("..", import.meta.url));
 
 function walk(dir: string): string[] {
   const out: string[] = [];
@@ -24,11 +25,28 @@ describe("Darkmatter theme", () => {
   });
 
   it("has a .dark block with the Darkmatter dark background", () => {
-    const darkStart = css.indexOf(".dark");
-    expect(darkStart).toBeGreaterThan(-1);
-    const darkBlock = css.slice(darkStart);
-    expect(darkBlock).toContain("#121113");
+    // Locate the real `.dark {` declaration, not the comment that mentions ".dark".
+    const declStart = css.indexOf(".dark {");
+    expect(declStart).toBeGreaterThan(-1);
+    const openBrace = css.indexOf("{", declStart);
+    expect(openBrace).toBeGreaterThan(declStart);
+    let depth = 0;
+    let closeBrace = -1;
+    for (let i = openBrace; i < css.length; i++) {
+      if (css[i] === "{") depth++;
+      else if (css[i] === "}") {
+        depth--;
+        if (depth === 0) {
+          closeBrace = i;
+          break;
+        }
+      }
+    }
+    expect(closeBrace).toBeGreaterThan(openBrace);
+    const darkBlock = css.slice(declStart, closeBrace + 1);
+    expect(darkBlock).toContain("--bg: #121113");
     expect(darkBlock).toContain("--primary: #e78a53");
+    expect(darkBlock).toContain("--border: #222222");
   });
 
   it("uses the Darkmatter radius and font stacks", () => {
@@ -49,5 +67,11 @@ describe("Darkmatter theme", () => {
         expect(text, `${file} still contains ${hex}`).not.toContain(hex);
       }
     }
+  });
+
+  it("removes the legacy amber hex from index.html", () => {
+    const html = readFileSync(join(rootDir, "index.html"), "utf8");
+    expect(html).not.toContain("%23ecad0a");
+    expect(html).not.toContain("#ecad0a");
   });
 });
