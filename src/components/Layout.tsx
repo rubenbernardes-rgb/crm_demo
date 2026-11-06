@@ -15,7 +15,7 @@ export function Layout() {
     <div className="grid min-h-screen grid-cols-[248px_1fr]">
       <aside className="sticky top-0 flex h-screen flex-col border-r bg-card px-3.5 py-5">
         <div className="mb-5 flex items-center gap-2.5 px-1.5">
-          <div className="grid h-9 w-9 place-items-center rounded-lg bg-brand-amber text-lg font-extrabold text-foreground">
+          <div className="grid h-9 w-9 place-items-center rounded-lg bg-primary text-lg font-extrabold text-primary-foreground">
             C
           </div>
           <div className="text-[15px] font-bold tracking-tight">Personal CRM</div>

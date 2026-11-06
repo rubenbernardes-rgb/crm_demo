@@ -49,16 +49,16 @@ const config: Config = {
           foreground: "hsl(var(--card-foreground))",
         },
         brand: {
-          amber: "#ecad0a",
-          amberInk: "#8a6406",
-          blue: "#209dd7",
-          blueInk: "#155e83",
-          purple: "#753991",
-          purpleInk: "#54296b",
-          green: "#1f9d55",
-          greenInk: "#14803f",
-          red: "#d83a3a",
-          redInk: "#b02a2a",
+          amber: "#d87943", // Darkmatter light primary (deep orange)
+          amberInk: "#e59a6a", // readable deep-orange text on dark tints
+          blue: "#5f8787", // Darkmatter chart-1 (teal)
+          blueInk: "#8fb3b3", // readable teal text on dark tints
+          purple: "#fbcb97", // Darkmatter chart-3 (peach)
+          purpleInk: "#fbcb97",
+          green: "#e78a53", // Darkmatter primary
+          greenInk: "#e78a53", // readable primary text on cards
+          red: "#ef4444", // Darkmatter destructive
+          redInk: "#f08c8c", // readable red text on dark tints
         },
       },
       borderRadius: {
@@ -67,7 +67,8 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ["Inter Variable", ...defaultTheme.fontFamily.sans],
+        // Darkmatter theme font: Geist Mono, bundled via @fontsource/geist-mono.
+        sans: ["Geist Mono", ...defaultTheme.fontFamily.mono],
       },
     },
   },

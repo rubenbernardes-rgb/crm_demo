@@ -18,7 +18,8 @@ const badgeVariants = cva(
         blue: "border-transparent bg-brand-blue/10 text-brand-blueInk",
         purple: "border-transparent bg-brand-purple/10 text-brand-purpleInk",
         amber: "border-transparent bg-brand-amber/15 text-brand-amberInk",
-        green: "border-transparent bg-brand-green/10 text-brand-greenInk",
+        // Darkmatter: the "won/customer" badge is solid primary, not a tint.
+        green: "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
         red: "border-transparent bg-brand-red/10 text-brand-redInk",
         slate: "border-transparent bg-foreground/10 text-foreground",
       },
