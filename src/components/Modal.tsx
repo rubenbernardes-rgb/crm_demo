@@ -1,5 +1,12 @@
-import { useEffect, type ReactNode } from "react";
-import { X } from "lucide-react";
+import type { ReactNode } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 
 interface ModalProps {
   open: boolean;
@@ -11,39 +18,25 @@ interface ModalProps {
 }
 
 export function Modal({ open, title, onClose, children, footer, size = "md" }: ModalProps) {
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
-    };
-  }, [open, onClose]);
-
-  if (!open) return null;
-
   return (
-    <div className="modal-overlay" onMouseDown={onClose}>
-      <div
-        className={`modal ${size === "sm" ? "modal-sm" : ""}`}
-        onMouseDown={(e) => e.stopPropagation()}
-        role="dialog"
-        aria-modal="true"
-        aria-label={title}
+    <Dialog
+      open={open}
+      onOpenChange={(o) => {
+        if (!o) onClose();
+      }}
+    >
+      <DialogContent
+        aria-describedby={undefined}
+        className={cn(size === "sm" ? "sm:max-w-[420px]" : "sm:max-w-[520px]")}
       >
-        <div className="modal-head">
-          <h3>{title}</h3>
-          <button className="btn btn-ghost btn-icon close" onClick={onClose} aria-label="Close">
-            <X />
-          </button>
-        </div>
-        <div className="modal-body">{children}</div>
-        {footer && <div className="modal-foot">{footer}</div>}
-      </div>
-    </div>
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+        </DialogHeader>
+        <div>{children}</div>
+        {footer && (
+          <DialogFooter className="border-t pt-4">{footer}</DialogFooter>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }

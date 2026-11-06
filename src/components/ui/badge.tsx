@@ -43,4 +43,6 @@ const Badge = React.forwardRef<
 });
 Badge.displayName = "Badge";
 
+export type BadgeVariant = NonNullable<VariantProps<typeof badgeVariants>["variant"]>;
+
 export { Badge, badgeVariants };

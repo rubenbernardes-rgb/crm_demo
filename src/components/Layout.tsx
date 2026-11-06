@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from "react-router-dom";
 import { Building2, LayoutDashboard, Users, Briefcase, LayoutGrid } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const NAV = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, end: true },
@@ -11,15 +12,15 @@ const NAV = [
 
 export function Layout() {
   return (
-    <div className="app">
-      <aside className="sidebar">
-        <div className="brand">
-          <div className="brand-mark">C</div>
-          <div className="brand-name">
-            Personal CRM
+    <div className="grid min-h-screen grid-cols-[248px_1fr]">
+      <aside className="sticky top-0 flex h-screen flex-col border-r bg-card px-3.5 py-5">
+        <div className="mb-5 flex items-center gap-2.5 px-1.5">
+          <div className="grid h-9 w-9 place-items-center rounded-lg bg-brand-amber text-lg font-extrabold text-foreground">
+            C
           </div>
+          <div className="text-[15px] font-bold tracking-tight">Personal CRM</div>
         </div>
-        <nav className="nav">
+        <nav className="flex flex-col gap-0.5">
           {NAV.map((item) => {
             const Icon = item.icon;
             return (
@@ -27,17 +28,24 @@ export function Layout() {
                 key={item.to}
                 to={item.to}
                 end={item.end}
-                className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}
+                className={({ isActive }) =>
+                  cn(
+                    "flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
+                    isActive && "bg-primary/10 font-semibold text-primary"
+                  )
+                }
               >
-                <Icon />
+                <Icon size={17} />
                 {item.label}
               </NavLink>
             );
           })}
         </nav>
-        <div className="sidebar-footer">Local &amp; private — your data lives on this machine.</div>
+        <div className="mt-auto border-t px-2.5 pt-3 text-xs text-muted-foreground">
+          Local &amp; private — your data lives on this machine.
+        </div>
       </aside>
-      <main className="main">
+      <main>
         <Outlet />
       </main>
     </div>
