@@ -91,16 +91,16 @@ export function Dashboard() {
           <div className="chart-wrap" style={{ height: 240 }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={wonChartData} margin={{ top: 8, right: 12, bottom: 0, left: -18 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eef0f3" />
-                <XAxis dataKey="label" tick={{ fontSize: 11, fill: "#78828f" }} axisLine={false} tickLine={false} />
-                <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: "#78828f" }} axisLine={false} tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#26262a" />
+                <XAxis dataKey="label" tick={{ fontSize: 11, fill: "#888888" }} axisLine={false} tickLine={false} />
+                <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: "#888888" }} axisLine={false} tickLine={false} />
                 <Tooltip
-                  cursor={{ fill: "rgba(32,157,215,0.07)" }}
+                  cursor={{ fill: "rgba(231,138,83,0.07)" }}
                   formatter={(v: number) => [`${v} deal${v === 1 ? "" : "s"}`, "Won"]}
                 />
                 <Bar dataKey="count" radius={[4, 4, 0, 0]} maxBarSize={42}>
                   {wonChartData.map((_, i) => (
-                    <Cell key={i} fill="#209dd7" />
+                    <Cell key={i} fill="#e78a53" />
                   ))}
                 </Bar>
               </BarChart>
@@ -115,22 +115,22 @@ export function Dashboard() {
           <div className="chart-wrap" style={{ height: 240 }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={revenueChartData} margin={{ top: 8, right: 12, bottom: 0, left: -8 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eef0f3" />
-                <XAxis dataKey="label" tick={{ fontSize: 11, fill: "#78828f" }} axisLine={false} tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#26262a" />
+                <XAxis dataKey="label" tick={{ fontSize: 11, fill: "#888888" }} axisLine={false} tickLine={false} />
                 <YAxis
                   tickFormatter={(v: number) => moneyShort(v)}
-                  tick={{ fontSize: 11, fill: "#78828f" }}
+                  tick={{ fontSize: 11, fill: "#888888" }}
                   axisLine={false}
                   tickLine={false}
                   width={56}
                 />
                 <Tooltip
-                  cursor={{ fill: "rgba(236,173,10,0.08)" }}
+                  cursor={{ fill: "rgba(95,135,135,0.08)" }}
                   formatter={(v: number) => [money(v), "Revenue"]}
                 />
                 <Bar dataKey="revenue" radius={[4, 4, 0, 0]} maxBarSize={42}>
                   {revenueChartData.map((_, i) => (
-                    <Cell key={i} fill="#ecad0a" />
+                    <Cell key={i} fill="#5f8787" />
                   ))}
                 </Bar>
               </BarChart>
